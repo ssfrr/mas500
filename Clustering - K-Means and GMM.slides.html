@@ -6372,17 +6372,25 @@ gg==
 <h2 id="thinking-probabilistically">Thinking Probabilistically</h2>
 <p>In the K-means we were pretty ad-hoc about why we'd want to move the centers of the clusters, because it seemed to intuitively make sense to do so. In Mixture Model parlance it's helpful to be a little more formal.</p>
 <p>Once we've picked initial parameters for our clusters, each one defines a probability distribution. For 3 clusters, let's call them \(P_1\), \(P_2\), and \(P_3\).</p>
-<p>What we're doing when we pick which cluster each point belongs to (Step 3 above) is choosing a cluster for each point \(x \in X\):</p>
+<p>What we're doing when we pick which cluster each point belongs to (Step 3 above) is choosing a cluster for each point \(x_i \in X\):</p>
 <p>\[
-\mathrm{argmax}_i \hspace{3 pt} P_i(x; \mu_i^{[t]}, \Sigma_i^{[t]})
+\DeclareMathOperator*{\argmax}{argmax}
+y_i = \argmax_k \hspace{3 pt} P_k(x_i; \mu_k^{[t]}, \Sigma_k^{[t]})
 \]</p>
 <p>That is, finding the cluster \(i\) for which the point \(x\) has the highest probability. Notice that if our distribution is a spherical gaussian, this is equivilant to finding the cluster with the closest mean (sound familiar?). In the literature you'll see this referenced as the &quot;Expectation&quot; step.</p>
-<p>The next step is known as the &quot;Maximization&quot; step, where we find the parameters for our model that maximize the probability of our given data. More formally, for each cluster \(i\):</p>
+<p>The next step is known as the &quot;Maximization&quot; step, where we find the parameters for our model that maximize the probability of our given data. More formally, for each cluster \(k\):</p>
 <p>\[
-\mu_i^{[t+1]}, \Sigma_i^{[t+1]} = \max_{\mu, \Sigma} \mathrm{Normal}(X_i; \mu, \Sigma)
+\DeclareMathOperator*{\argmax}{argmax}
+\begin{align}
+\mu_k^{[t+1]}, \Sigma_k^{[t+1]} &amp;= \argmax_{\mu, \Sigma} \hspace{5pt} P_k(X_k; \mu, \Sigma) \\
+                                &amp;= \argmax_{\mu, \Sigma} \prod_{x \in X_k} \mathrm{Normal}(x; \mu, \Sigma)
+\end{align}
 \]</p>
-<p>where \(X_i\) is the set of \(x \in X\) that we've selected in the Expectation step to be in cluster \(i\).</p>
+<p>where \(X_k\) is the set of \(x \in X\) that we've selected in the Expectation step to be in cluster \(k\).</p>
+<h3 id="what-assumption-is-this-making">What assumption is this making?</h3>
+<p>Notice how the probability of the training data is the product of the training data, and the probability of each training point is Normally distributed. This is only valid if we assume the data points are &quot;i.i.d&quot;, which is an acronym that you'll see a lot in the literature that means &quot;Independent and Identically Distributed&quot;, which means that the same distribution (Normal with the given \(\mu\) an \(\Sigma\)) applies to all data points, and they are independent of each other.</p>
 <p>This is a slightly simplified example of a general algorithm called the &quot;Expectation-Maximization&quot;, or &quot;EM&quot; algorithm. It has many variants, but it's always an iterative back-and-forth algorithm. One important variant is that in the E-step, instead of making a hard selection of which cluster each point is in, you actually calculate the expected value of the cluster, which is where the step gets its name.</p>
+<p>At each step you can see how we find new values for \(\mu_i\) and \(\Sigma_i\), for each of our 3 clusters. As with the K-means algorithm it will not necessarily converge to a global optimum, so it's important to run several times with different starting points to more fully explore the space.</p>
 </div>
     </div><div style=display:none>
     

@@ -9,5 +9,5 @@ while true; do
         fi
     done
     echo -n "."
-    sleep 1
+    sleep 4
 done
